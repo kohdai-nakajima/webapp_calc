@@ -1,6 +1,6 @@
 import * as React from "react";
 
-const apiServerUrl: string = "http://localhost:8080";
+// const apiServerUrl: string = "http://localhost:8080";
 const calculaterGameEndpoint: string = "/api/math/calculater-game";
 
 type CalculaterGameData = {
@@ -22,7 +22,8 @@ const App: React.FC = () => {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(apiServerUrl + calculaterGameEndpoint);
+        // const res = await fetch(apiServerUrl + calculaterGameEndpoint);
+        const res = await fetch(calculaterGameEndpoint);
         const json: React.SetStateAction<CalculaterGameData | null> = await res.json();
         setCalculaterGameData(json);
       } catch (e: unknown) {
