@@ -1,0 +1,21 @@
+.container {
+  display: block;
+  text-align: center;
+}
+
+.question {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.button {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.answer {
+  display: none;
+  font-size: 20px;
+  font-weight: 800;
+  color: darkorange;
+}
