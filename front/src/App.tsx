@@ -4,9 +4,9 @@ import * as React from "react";
 // 画像のimport
 import img_cracker from "./images/cracker.gif";
 
-const apiServerUrl: string = "http://localhost:8080";
-const calculaterGameEndpoint: string = apiServerUrl + "/api/math/calculater-game";
-// const calculaterGameEndpoint: string = "/api/math/calculater-game";
+// const apiServerUrl: string = "http://localhost:8080";
+// const calculaterGameEndpoint: string = apiServerUrl + "/api/math/calculater-game";
+const calculaterGameEndpoint: string = "/api/math/calculater-game";
 
 type CalculaterGameData = {
   question: number;
