@@ -8,7 +8,7 @@ export const createQuestion = (request: express.Request, response: express.Respo
 
     response.status(200).json(
         {
-            question: `${first} + ${second} = ?`, 
+            question: `${first} + ${second}`, 
             answer: result 
         }
     );

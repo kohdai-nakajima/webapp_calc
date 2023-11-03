@@ -69,4 +69,9 @@ WebARENAのインスタンスがちょいちょい停止になるので、
   - [Nodeとnpmのバージョン対比表](https://nodejs.org/ja/download/releases)
 
 # Reactの諸々
+- [今から始めるReact入門 〜 React の基本](https://qiita.com/TsutomuNakamura/items/72d8cf9f07a5a30be048)
 - [React hooks周り](https://qiita.com/seira/items/e62890f11e91f6b9653f)
+- [Reactで画像を表示する方法](https://qiita.com/ytnd0928/items/22704b1c47c20e1bd83f)
+
+# その他知識集
+- [CSSアニメーション](https://coco-factory.jp/ugokuweb/css02/)
