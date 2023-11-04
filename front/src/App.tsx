@@ -4,9 +4,15 @@ import * as React from "react";
 // 画像のimport
 import img_cracker from "./images/cracker.gif";
 
-// const apiServerUrl: string = "http://localhost:8080";
-// const calculaterGameEndpoint: string = apiServerUrl + "/api/math/calculater-game";
-const calculaterGameEndpoint: string = "/api/math/calculater-game";
+const apiServerUrl: string = "http://localhost:8080";
+const grade1: string = "?maxNum=10&validOparation=plus,minus"
+const prevention: string = "?maxNum=1000&validOparation=plus,minus,multi,divide"
+
+// const grade1CalculaterGameEndpoint: string = apiServerUrl + "/api/math/calculater-game" + grade1;
+// const preventionCalculaterGameEndpoint: string = apiServerUrl + "/api/math/calculater-game" + prevention;
+const grade1CalculaterGameEndpoint: string = "/api/math/calculater-game" + grade1;
+const preventionCalculaterGameEndpoint: string = "/api/math/calculater-game" + prevention;
+
 
 type CalculaterGameData = {
   question: number;
@@ -14,7 +20,10 @@ type CalculaterGameData = {
 };
 
 const App: React.FC = () => {
-  
+
+  // state: 計算ゲームのモード
+  const [calculaterGameMode, setCalculaterGameMode] = React.useState<string | null>("grade1");
+
   // state: 計算ゲームのデータ
   const [calculaterGameData, setCalculaterGameData] = React.useState<CalculaterGameData | null>(null);
 
@@ -31,9 +40,14 @@ const App: React.FC = () => {
    */
   const fetchData = async(callback: Function | null): Promise<void> => {
     try {
-      const res = await fetch(calculaterGameEndpoint);
-      // const res = await fetch(calculaterGameEndpoint);
-      const json: React.SetStateAction<CalculaterGameData | null> = await res.json();
+      let res;
+      if(calculaterGameMode == 'grade1') {
+        res = await fetch(grade1CalculaterGameEndpoint);
+      } else if (calculaterGameMode == 'prevention') {
+        res = await fetch(preventionCalculaterGameEndpoint);
+      }
+      
+      const json: React.SetStateAction<CalculaterGameData | null> = await res?.json();
       setCalculaterGameData(json);
     } catch (e: unknown) {
       console.error(e);
@@ -214,6 +228,11 @@ const App: React.FC = () => {
 
           <button className="a__checkAnswerButton" onClick={(): void => {checkAnswer(calculaterGameData?.answer)}}>こたえあわせ</button>
         </div>
+
+        <button onClick={() => {
+          setCalculaterGameMode('prevention');
+          fetchData(null);
+          }}>テスト</button>
       </div>
     </>
   );
