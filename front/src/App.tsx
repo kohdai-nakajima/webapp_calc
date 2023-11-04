@@ -4,8 +4,8 @@ import * as React from "react";
 import img_cracker from "./images/cracker.gif";
 
 const apiServerUrl: string = "http://localhost:8080";
-const calculaterGameEndpoint: string = apiServerUrl + "/api/math/calculater-game";
-// const calculaterGameEndpoint: string = "/api/math/calculater-game";
+// const calculaterGameEndpoint: string = apiServerUrl + "/api/math/calculater-game";
+const calculaterGameEndpoint: string = "/api/math/calculater-game";
 
 /**
  * 計算ゲームのAPI取得データ型.
