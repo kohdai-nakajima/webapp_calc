@@ -151,7 +151,7 @@ const App: React.FC = () => {
   const refresh = () => {
 
     // stateのリフレッシュ
-    setQuestionCount(0);
+    setQuestionCount(1);
     setFailureCount(0);
     setDisplayResult(false);
     setCheckOk(false);
@@ -253,7 +253,7 @@ const App: React.FC = () => {
     })
     return (
       <div className="ma js-ma">
-        <p className="ma__text">◎</p>
+        <p className="ma__text">○</p>
       </div>
     );
   }
