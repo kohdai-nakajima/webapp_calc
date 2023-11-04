@@ -1,52 +1,85 @@
-import { equal } from "assert";
 import * as React from "react";
 
 // 画像のimport
 import img_cracker from "./images/cracker.gif";
 
 const apiServerUrl: string = "http://localhost:8080";
-const grade1: string = "?maxNum=10&validOparation=plus,minus"
-const prevention: string = "?maxNum=1000&validOparation=plus,minus,multi,divide"
+const calculaterGameEndpoint: string = apiServerUrl + "/api/math/calculater-game";
+// const calculaterGameEndpoint: string = "/api/math/calculater-game";
 
-// const grade1CalculaterGameEndpoint: string = apiServerUrl + "/api/math/calculater-game" + grade1;
-// const preventionCalculaterGameEndpoint: string = apiServerUrl + "/api/math/calculater-game" + prevention;
-const grade1CalculaterGameEndpoint: string = "/api/math/calculater-game" + grade1;
-const preventionCalculaterGameEndpoint: string = "/api/math/calculater-game" + prevention;
-
-
+/**
+ * 計算ゲームのAPI取得データ型.
+ */
 type CalculaterGameData = {
   question: number;
   answer: string;
-};
+}
+
+/** 小学１年生モード. */
+const modeGrade1: string = 'grade1';
+
+/** 小学2年生モード. */
+const modeGrade2: string = 'grade2';
+
+/** 小学3年生モード. */
+const modeGrade3: string = 'grade3';
+
+/** ボケ防止モード. */
+const modePrevention: string = 'prevention';
+
+/** No Limitモード. */
+const modeNoLimit: string = 'nolimit';
+
+/** モードMap. */
+const modeMap: Map<String, string> = new Map([
+  [modeGrade1, '?minNum=0&maxNum=20&maxResult=20&validOparation=plus,minus'],
+  [modeGrade2, '?minNum=0&maxNum=9&maxResult=99&validOparation=plus,minus,multi,devide'],
+  [modeGrade3, '?minNum=0&maxNum=99&maxResult=99&validOparation=plus,minus,multi,devide'],
+  [modePrevention, '?minNum=2&maxNum=999&maxResult=1000&validOparation=plus,minus,multi,divide'],
+  [modeNoLimit, '?minNum=0&maxNum=9999&maxResult=10000000&validOparation=plus,minus,multi,divide'],
+]);
+
+/** 連続で解く最大の問題数. */
+const maxQuestionCount: number = 10;
 
 const App: React.FC = () => {
 
   // state: 計算ゲームのモード
-  const [calculaterGameMode, setCalculaterGameMode] = React.useState<string | null>("grade1");
+  const [calculaterGameMode, setCalculaterGameMode] = React.useState<string | null>(modeGrade1);
 
   // state: 計算ゲームのデータ
   const [calculaterGameData, setCalculaterGameData] = React.useState<CalculaterGameData | null>(null);
 
-  // state: せいかいモーダルの状態
-  const [checkOkModal, displayCheckOkModal] = React.useState<Boolean>(false);
+  // state: 現在の問題数
+  const [questionCount, setQuestionCount] = React.useState<number>(1);
 
-  // state: ざんねんモーダルの状態
-  const [checkNgModal, displayCheckNgModal] = React.useState<Boolean>(false);
+  // state: まちがえた回数
+  const [failureCount, setFailureCount] = React.useState<number>(0);
+
+  // state: せいかいしたか
+  const [checkOk, setCheckOk] = React.useState<Boolean>(false);
+
+  // state: まちがえたか
+  const [checkNg, setCheckNg] = React.useState<Boolean>(false);
+
+  // state: 結果modelを表示するか
+  const [displayResult, setDisplayResult] = React.useState<Boolean>(false);
+
+  // state: レベル設定Toastを表示するか
+  const [displaySetting, setDisplaySettingToast] = React.useState<Boolean>(false);
 
   /**
    * 計算ゲーム用情報取得APIを叩いて、取得したデータでstate(calculaterGameData)を更新する.
    * 
+   * @param mode 計算モード.
    * @param callback callback関数
    */
-  const fetchData = async(callback: Function | null): Promise<void> => {
+  const fetchData = async(mode: string | null, callback: Function | null): Promise<void> => {
     try {
-      let res;
-      if(calculaterGameMode == 'grade1') {
-        res = await fetch(grade1CalculaterGameEndpoint);
-      } else if (calculaterGameMode == 'prevention') {
-        res = await fetch(preventionCalculaterGameEndpoint);
-      }
-      
+      const modeUrl: string | undefined = mode ? modeMap.get(mode) : (
+        calculaterGameMode ? modeMap.get(calculaterGameMode) : '');
+      const res = await fetch(calculaterGameEndpoint + modeUrl);
+
       const json: React.SetStateAction<CalculaterGameData | null> = await res?.json();
       setCalculaterGameData(json);
     } catch (e: unknown) {
@@ -90,9 +123,11 @@ const App: React.FC = () => {
    */
   const checkAnswer = (answer: string | undefined) => {
 
-    if(!answer) {
+    // undefined、nullの場合のみanswerが存在しないと捉える
+    // (!answer)だと0が入ってきてもtrueになる
+    if(answer === undefined || answer === null) {
       // answerが取得できていない場合はfetchし直す
-      fetchData(null);
+      fetchData(null, null);
       return null;
     }
 
@@ -103,64 +138,77 @@ const App: React.FC = () => {
 
     // 入力値と答えの比較
     if(answer == inputedNumber) {
-      displayCheckOkModal(true);
+      setCheckOk(true);
     } else {
-      displayCheckNgModal(true);
+      setCheckNg(true);
     }
 
   }
 
   /**
-   * せいかいmodal.
+   * stateをリフレッシュし、新しい問題を取得する.
+   */
+  const refresh = () => {
+
+    // stateのリフレッシュ
+    setQuestionCount(0);
+    setFailureCount(0);
+    setDisplayResult(false);
+    setCheckOk(false);
+    setCheckNg(false);
+    clearInput();
+  }
+
+  /**
+   * 結果modelを表示する.
+   */
+  const displayResultModal = () => {
+    setDisplayResult(true)
+  }
+
+  /**
+   * 結果modal.
    * 
    * @returns ModalのDOM
    */
-  function OkModal() {
+  function ResultModal() {
     return (
       <div className="m">
         <div className="m-overlay"></div>
         <div className="m-content">
           <img className="m-content__cracker" src={img_cracker} />
           <img className="m-content__cracker__reverse" src={img_cracker} />
-          <p className="m-content__text">せいかい！</p>
-          <p className="m-content__subText">よくできました</p>
-          <button className="m-content__nextButton" onClick={displayNextQuestion}>つぎのもんだい</button>
+          <p className="m-content__text">おつかれさまでした！</p>
+          <p className="m-content__subText">まちがえた かいすうは <br />{failureCount}かい でした</p>
+
+          {(failureCount == 0) && <p className="m-content__text">すばらしい！</p>}
+
+          <button className="m-content__nextButton" onClick={() => {refresh(); fetchData(null, null);}}>もういちど</button>
         </div>
       </div>
     );
   }
 
   /**
-   * ざんねんmodal.
-   * 
-   * @returns ModalのDOM
+   * 入力値のクリア.
    */
-  function NgModal() {
-    return (
-      <div className="m">
-        <div className="m-overlay"></div>
-        <div className="m-content">
-          <p className="m-content__ng__text">ざんねん！</p>
-          <p className="m-content__ng__subText">もういちど</p>
-          <p className="m-content__ng__subText">かんがえよう</p>
-          <button className="m-content__close" onClick={closeModal}>もどる</button>
-        </div>
-      </div>
-    );
+  const clearInput = () => {
+    const inputed: HTMLInputElement = document.querySelector('.js-input') as HTMLInputElement;
+    inputed.innerHTML = '';    
   }
 
   /**
    * つぎのもんだいを表示する.
    */
   const displayNextQuestion = (): void => {
-    fetchData(() => {
+    fetchData(null, () => {
 
       // 各modalを非表示に
       closeModal();
 
       // 入力値のクリア
-      const inputed: HTMLInputElement = document.querySelector('.js-input') as HTMLInputElement;
-      inputed.innerHTML = '';
+      clearInput();
+
     });
   }
 
@@ -170,30 +218,132 @@ const App: React.FC = () => {
   const closeModal = () => {
 
       // 各modalを非表示に
-      if(checkOkModal) {
-        displayCheckOkModal(false);
+      if(checkOk) {
+        setCheckOk(false);
       }
-      if(checkNgModal) {
-        displayCheckNgModal(false);
+      if(checkNg) {
+        setCheckNg(false);
       }
+  }
+
+  /**
+   * OKマークを表示.
+   * @returns OKマークDOM
+   */
+  function OkMark() {
+    React.useEffect(() => {
+      const timer = setTimeout(() => {
+
+        if(maxQuestionCount <= questionCount) {
+          // 問題数が最大値に達した場合、結果modalを表示する
+          displayResultModal();
+
+        } else {
+          // まだ問題数が上限に達していない時、
+          // つぎの問題を表示して○を消し、入力値をクリアし、問題数を更新
+          displayNextQuestion();
+          setQuestionCount(questionCount + 1);
+        }
+
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    })
+    return (
+      <div className="ma js-ma">
+        <p className="ma__text">◎</p>
+      </div>
+    );
+  }
+
+  /**
+   * NGマークを表示.
+   * @returns NGマークDOM
+   */
+  function NgMark() {
+    React.useEffect(() => {
+      const timer = setTimeout(() => {
+        // ×を消す
+        closeModal();
+        // まちがえた回数更新
+        setFailureCount(failureCount + 1);
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    })
+    return (
+      <div className="ma">
+        <p className="ma__text">×</p>
+      </div>
+    );
+  }
+
+  /**
+   * レベル設定トーストを表示する.
+   */
+  const displaySettingToast = () => {
+    setDisplaySettingToast(true);
+  }
+
+  /**
+   * 指定のモードに変更する.
+   * 
+   * @param mode モード文字列.
+   */
+  const changeMode = (mode: string) => {
+    // modeを設定
+    setCalculaterGameMode(() => {
+      fetchData(mode, null);
+      return mode;
+    });
+    // 各種stateのリフレッシュ
+    refresh();
+    // レベル設定トーストを閉じる
+    setDisplaySettingToast(false);
+  }
+
+  /**
+   * レベル設定トースト.
+   * @returns 
+   */
+  function SettingToast() {
+    return (
+      <div className="s">
+        <button className="s-button" onClick={() => changeMode(modeGrade1)}>小学１年生モード</button>
+        <button className="s-button" onClick={() => changeMode(modeGrade2)}>小学２年生モード</button>
+        <button className="s-button" onClick={() => changeMode(modeGrade3)}>小学３年生モード</button>
+        <button className="s-button" onClick={() => changeMode(modePrevention)}>ボケ防止モード</button>
+        <button className="s-button" onClick={() => changeMode(modeNoLimit)}>NO LIMIT！</button>
+      </div>
+    );
   }
 
   // useEffect：：関数の実行タイミングをReactのレンダリング後まで遅らせるHook.
   React.useEffect(() => {
-    fetchData(null);
+    fetchData(null, null);
   }, []);
 
   return (
     <>
-      {/* せいかいモーダル(checkOkModalがtrueなら＜OkModal>を表示) */}
-      {checkOkModal && <OkModal />}
+      {/* せいかいマーク表示 */}
+      {checkOk && <OkMark />}
 
-      {/* ざんねんモーダル(checkNgModalがtrueなら＜NgModal>を表示) */}
-      {checkNgModal && <NgModal />}
+      {/* ざんねんマーク表示 */}
+      {checkNg && <NgMark />}
+
+      {/* 結果modal表示. */}
+      {displayResult && <ResultModal />}
 
       <div className="container">
         <div className="q">
-          <p className="q__text">もんだい</p>
+          <div className="q-text">
+            <p className="q-text__main">もんだい</p>
+            <p className="q-text__sub">{questionCount}もんめ</p>
+          </div>
           <div className="q-wrap">
             <p className="q-wrap__question">{calculaterGameData?.question}</p>
             <p className="q-wrap__text">=</p>
@@ -220,19 +370,13 @@ const App: React.FC = () => {
         </div>
         
         <div className="a">
-          {/* <button className="a__button" onClick={displayAnswer}>こたえをみる</button>
-          <div className="a-answer">
-            <p className="a-answer__displayArea">こたえ：{calculaterGameData?.answer}</p>
-            <button className="a-answer__nextButton" onClick={fetchData}>つぎのもんだい</button>
-          </div> */}
-
           <button className="a__checkAnswerButton" onClick={(): void => {checkAnswer(calculaterGameData?.answer)}}>こたえあわせ</button>
         </div>
 
-        <button onClick={() => {
-          setCalculaterGameMode('prevention');
-          fetchData(null);
-          }}>テスト</button>
+        <button className="l-settingButton" onClick={() => {displaySettingToast()}}>ほかのレベルをみる</button>
+        {/* レベル設定トースト. */}
+        {displaySetting && <SettingToast />}
+
       </div>
     </>
   );

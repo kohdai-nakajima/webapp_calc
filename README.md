@@ -72,6 +72,8 @@ WebARENAのインスタンスがちょいちょい停止になるので、
 - [今から始めるReact入門 〜 React の基本](https://qiita.com/TsutomuNakamura/items/72d8cf9f07a5a30be048)
 - [React hooks周り](https://qiita.com/seira/items/e62890f11e91f6b9653f)
 - [Reactで画像を表示する方法](https://qiita.com/ytnd0928/items/22704b1c47c20e1bd83f)
+- [[React] 副作用フックを使用してsetTimeoutのタイマーをリセットする](https://dev.classmethod.jp/articles/reset-timer-for-settimeout-using-use-effect-in-react/)
+- [【React】「useStateの値を更新しても反映されない！」の解決方法](https://zenn.dev/syu/articles/3c4aa813b57b8c)
 
 # その他知識集
 - [CSSアニメーション](https://coco-factory.jp/ugokuweb/css02/)
