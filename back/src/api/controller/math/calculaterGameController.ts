@@ -30,13 +30,18 @@ export const createQuestion = (
         }
     }
 
+    console.log("operation.displayName : " + operation.displayName);
+    console.log("operation.num : " + operation.num);
+
     // 数値と計算結果の取得
     let first: number;
     let second: number;
     let result: number;
+    let loopCount: number = 1;
     switch(operation.num) {
         case 0:
             while(true) {
+                console.log(loopCount++);
                 first = createRandomInteger(minNum, maxNum);
                 second = createRandomInteger(minNum, maxNum);        
                 result = first + second;
@@ -49,6 +54,7 @@ export const createQuestion = (
         case 1:
             // 引き算の場合はマイナスにならないものだけ表示する
             while(true) {
+                console.log(loopCount++);
                 first = createRandomInteger(minNum, maxNum);
                 second = createRandomInteger(minNum, maxNum);        
                 result = first - second;
@@ -62,6 +68,7 @@ export const createQuestion = (
 
         case 2:
             while(true) {
+                console.log(loopCount++);
                 first = createRandomInteger(minNum, maxNum);
                 second = createRandomInteger(minNum, maxNum);        
                 result = first * second;
@@ -74,6 +81,7 @@ export const createQuestion = (
         case 3:
             // 割り算は割り切れるものだけ表示する
             while(true) {
+                console.log(loopCount++);
                 first = createRandomInteger(minNum, maxNum);
                 second = createRandomInteger(minNum, maxNum);        
                 if(first % second == 0) {
@@ -92,6 +100,10 @@ export const createQuestion = (
             operation = new ArithmeticOperation(-1, '');
     }
 
+    console.log("first : " + first);
+    console.log("second : " + second);
+    console.log("result : " + result);
+
     response.status(200).json(
         {
             question: `${first} ${operation.displayName} ${second}`, 
@@ -109,7 +121,7 @@ export const createQuestion = (
 const createRandomInteger = (min: string, max: string): number => {
     while(true) {
         const num: number = Math.floor(Math.random() * (Number(max) + 1));
-        if(num >= Number(min)) {
+        if(!min || num >= Number(min)) {
             return num;
         }
     }
