@@ -68,6 +68,14 @@ WebARENAのインスタンスがちょいちょい停止になるので、
 - npm init -yを叩くとnpmのバージョンを上げろと言われるが、nodeのバージョンと会っていないとあげられないので、あげない
   - [Nodeとnpmのバージョン対比表](https://nodejs.org/ja/download/releases)
 
+# 本番環境での環境構築困りごとメモ
+- npm run serverいたサーバが勝手に落ちてしまう
+  - 例外を検出すると落ちてしまう？
+  - foreverをinstallした 
+    - [参照1](https://gihyo.jp/dev/serial/01/nodejs/0002)
+    - [参照2](https://github.com/foreversd/forever/issues/1057#issuecomment-626194082)
+    - forever start -c "npm run server" ./
+
 # Reactの諸々
 - [今から始めるReact入門 〜 React の基本](https://qiita.com/TsutomuNakamura/items/72d8cf9f07a5a30be048)
 - [React hooks周り](https://qiita.com/seira/items/e62890f11e91f6b9653f)

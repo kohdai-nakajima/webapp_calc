@@ -147,8 +147,8 @@
 }
 
 .ma__text {
-  font-size: 400px;
-  font-weight: 900;
+  font-size: 250px;
+  font-weight: 1200;
   color: #FF0033;
   animation: zoomIn 1s;
 }

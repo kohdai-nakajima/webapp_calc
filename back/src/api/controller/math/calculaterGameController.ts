@@ -30,9 +30,6 @@ export const createQuestion = (
         }
     }
 
-    console.log("operation.displayName : " + operation.displayName);
-    console.log("operation.num : " + operation.num);
-
     // 数値と計算結果の取得
     let first: number;
     let second: number;
@@ -99,10 +96,6 @@ export const createQuestion = (
             result = 0;
             operation = new ArithmeticOperation(-1, '');
     }
-
-    console.log("first : " + first);
-    console.log("second : " + second);
-    console.log("result : " + result);
 
     response.status(200).json(
         {
