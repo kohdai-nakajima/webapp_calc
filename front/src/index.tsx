@@ -1,15 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { Top } from './components/tsx/Top';
+import CustomNavigator from './components/tsx/CustomNavigator';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+
+    {/* Navigationメニューを表示.これは全画面共通で表示する. */}
+    <CustomNavigator />
+
   </React.StrictMode>
 );
 

@@ -1,11 +1,12 @@
 import * as React from "react";
+import "../css/Calculator.css";
 
 // 画像のimport
-import img_cracker from "./images/cracker.gif";
+import img_cracker from "../images/cracker.gif";
+import { Route } from "react-router-dom";
 
-const apiServerUrl: string = "http://localhost:8080";
-// const calculaterGameEndpoint: string = apiServerUrl + "/api/math/calculater-game";
-const calculaterGameEndpoint: string = "/api/math/calculater-game";
+const endpointRoot: string | undefined = process.env.REACT_APP_ENDPOINT_ROOT;
+const calculaterGameEndpoint: string = endpointRoot + "/api/math/calculater-game";
 
 /**
  * 計算ゲームのAPI取得データ型.
@@ -42,7 +43,7 @@ const modeMap: Map<String, string> = new Map([
 /** 連続で解く最大の問題数. */
 const maxQuestionCount: number = 10;
 
-const App: React.FC = () => {
+const Calculator: React.FC = () => {
 
   // state: 計算ゲームのモード
   const [calculaterGameMode, setCalculaterGameMode] = React.useState<string | null>(modeGrade1);
@@ -382,4 +383,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default Calculator;
